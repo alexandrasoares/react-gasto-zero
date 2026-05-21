@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import Navbar from '../components/navbar.component';
 import Tabs from '../components/tabs.component';
 import TimelineCard from '../components/timeline-card.component';
@@ -7,13 +6,14 @@ import Pagination from '../components/pagination.component';
 import { behavioralHistoryService } from '../services/behavioral-history.service';
 import { BEHAVIORAL_HISTORY_CONSTANTS } from '../constants/behavioral-history.constant';
 import { TimelineEntry } from '../interfaces/behavioral-history.interface';
+import { useLanguageChange } from '../hooks/useLanguageChange';
 
 interface BehavioralHistoryProps {
   onNavigate?: (path: string) => void;
 }
 
 const BehavioralHistory: React.FC<BehavioralHistoryProps> = ({ onNavigate }) => {
-  const { t } = useTranslation();
+  const { t } = useLanguageChange();
   const [timelineEntries, setTimelineEntries] = useState<TimelineEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('timeline');

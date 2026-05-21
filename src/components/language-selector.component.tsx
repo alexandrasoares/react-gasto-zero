@@ -1,8 +1,20 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from 'react';
+import i18n from '../i18n/config';
 
 const LanguageSelector: React.FC = () => {
-  const { i18n } = useTranslation();
+  const [currentLang, setCurrentLang] = useState(i18n.language);
+
+  useEffect(() => {
+    const handleLanguageChange = (lng: string) => {
+      setCurrentLang(lng);
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, []);
 
   const languages = [
     { code: 'pt-BR', label: 'Português', flag: '🇧🇷' },
@@ -10,16 +22,16 @@ const LanguageSelector: React.FC = () => {
     { code: 'es-ES', label: 'Español', flag: '🇪🇸' },
   ];
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+  const changeLanguage = async (lng: string) => {
+    await i18n.changeLanguage(lng);
   };
 
   return (
     <div className="relative">
       <select
-        value={i18n.language}
+        value={currentLang}
         onChange={(e) => changeLanguage(e.target.value)}
-        className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer"
+        className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer shadow-sm"
       >
         {languages.map((lang) => (
           <option key={lang.code} value={lang.code}>
@@ -27,7 +39,7 @@ const LanguageSelector: React.FC = () => {
           </option>
         ))}
       </select>
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
         <svg
           className="fill-current h-4 w-4"
           xmlns="http://www.w3.org/2000/svg"

@@ -5,12 +5,14 @@ import Button from '../components/button.component';
 import { rewardsService } from '../services/rewards.service';
 import { REWARDS_CONSTANTS } from '../constants/rewards.constant';
 import { Reward, UserPoints } from '../interfaces/rewards.interface';
+import { useLanguageChange } from '../hooks/useLanguageChange';
 
 interface RewardsProps {
   onNavigate?: (path: string) => void;
 }
 
 const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
+  const { t } = useLanguageChange();
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [userPoints, setUserPoints] = useState<UserPoints | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,7 +65,7 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
           onNavigate={onNavigate}
         />
         <div className="flex items-center justify-center h-96">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-gray-500">{t('loading')}</div>
         </div>
       </div>
     );
@@ -80,13 +82,13 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          {REWARDS_CONSTANTS.PAGE_TITLE}
+          {t('rewards.title')}
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {REWARDS_CONSTANTS.AVAILABLE_REWARDS.TITLE}
+              {t('rewards.availableRewards')}
             </h2>
             <div className="space-y-6">
               {rewards.map((reward) => (
@@ -97,10 +99,10 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
                     <p className="text-sm text-gray-600 mb-4">{reward.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-gray-700">
-                        {reward.pointsRequired} Points
+                        {reward.pointsRequired} {t('rewards.points')}
                       </span>
                       {reward.unlocked ? (
-                        <span className="text-green-600 font-semibold">Unlocked</span>
+                        <span className="text-green-600 font-semibold">{t('rewards.unlocked')}</span>
                       ) : (
                         <Button
                           onClick={() => handleUnlock(reward.id)}
@@ -109,8 +111,8 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
                           className="text-sm"
                         >
                           {unlocked === reward.id
-                            ? 'Unlocked!'
-                            : `${REWARDS_CONSTANTS.AVAILABLE_REWARDS.UNLOCK_BUTTON} (${reward.pointsRequired} Points)`
+                            ? t('rewards.unlocked')
+                            : `${t('rewards.unlock')} (${reward.pointsRequired} ${t('rewards.points')})`
                           }
                         </Button>
                       )}
@@ -124,16 +126,16 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
           <div>
             <Card className="p-6 sticky top-4">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                {REWARDS_CONSTANTS.YOUR_POINTS.TITLE}
+                {t('rewards.yourPoints')}
               </h2>
               <div className="text-center">
                 <p className="text-sm text-gray-600 mb-2">
-                  {REWARDS_CONSTANTS.YOUR_POINTS.TOTAL_POINTS}
+                  {t('rewards.totalPoints')}
                 </p>
                 <p className="text-5xl font-bold text-green-600">{userPoints?.total}</p>
               </div>
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm text-gray-600 mb-4">Progress to next reward:</p>
+                <p className="text-sm text-gray-600 mb-4">{t('rewards.progressToNextReward')}</p>
                 {rewards.filter(r => !r.unlocked).length > 0 && (
                   <div className="space-y-3">
                     {rewards
@@ -154,7 +156,7 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
                               ></div>
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
-                              {reward.pointsRequired - (userPoints?.total || 0)} more points needed
+                              {reward.pointsRequired - (userPoints?.total || 0)} {t('rewards.morePointsNeeded')}
                             </p>
                           </div>
                         );

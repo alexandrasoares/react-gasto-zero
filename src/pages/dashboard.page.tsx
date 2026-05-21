@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import Navbar from '../components/navbar.component';
 import Card from '../components/card.component';
 import { dashboardService } from '../services/dashboard.service';
 import { DASHBOARD_CONSTANTS } from '../constants/dashboard.constant';
 import { DashboardStats } from '../interfaces/dashboard.interface';
+import { useLanguageChange } from '../hooks/useLanguageChange';
 
 interface DashboardProps {
   onNavigate?: (path: string) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
-  const { t } = useTranslation();
+  const { t } = useLanguageChange();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
