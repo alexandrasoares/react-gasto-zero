@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../components/navbar.component';
 import Tabs from '../components/tabs.component';
 import TimelineCard from '../components/timeline-card.component';
@@ -12,6 +13,7 @@ interface BehavioralHistoryProps {
 }
 
 const BehavioralHistory: React.FC<BehavioralHistoryProps> = ({ onNavigate }) => {
+  const { t } = useTranslation();
   const [timelineEntries, setTimelineEntries] = useState<TimelineEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('timeline');
@@ -39,10 +41,6 @@ const BehavioralHistory: React.FC<BehavioralHistoryProps> = ({ onNavigate }) => 
   const endIndex = startIndex + entriesPerPage;
   const currentEntries = timelineEntries.slice(startIndex, endIndex);
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-  };
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -57,7 +55,7 @@ const BehavioralHistory: React.FC<BehavioralHistoryProps> = ({ onNavigate }) => 
           onNavigate={onNavigate}
         />
         <div className="flex items-center justify-center h-96">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-gray-500">{t('loading')}</div>
         </div>
       </div>
     );
@@ -74,35 +72,39 @@ const BehavioralHistory: React.FC<BehavioralHistoryProps> = ({ onNavigate }) => 
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
-          {BEHAVIORAL_HISTORY_CONSTANTS.PAGE_TITLE}
+          {t('behavioralHistory.title')}
         </h1>
         
         <Tabs
-          tabs={BEHAVIORAL_HISTORY_CONSTANTS.TABS}
+          tabs={[
+            { value: 'timeline', label: t('behavioralHistory.timeline') },
+            { value: 'insights', label: t('behavioralHistory.insights') },
+          ]}
           activeTab={activeTab}
-          onTabChange={handleTabChange}
+          onTabChange={setActiveTab}
         />
         
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            {BEHAVIORAL_HISTORY_CONSTANTS.TIMELINE_SECTION.TITLE}
-          </h2>
-          
-          <div className="space-y-4">
-            {currentEntries.map((entry) => (
-              <TimelineCard key={entry.id} entry={entry} />
-            ))}
+        {activeTab === 'timeline' && (
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              {t('behavioralHistory.timeline')}
+            </h2>
+            <div className="space-y-4">
+              {currentEntries.map((entry) => (
+                <TimelineCard key={entry.id} entry={entry} />
+              ))}
+            </div>
+            
+            <div className="mt-6 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                prevLabel={t('behavioralHistory.prev')}
+                nextLabel={t('behavioralHistory.next')}
+              />
+            </div>
           </div>
-        </div>
-        
-        {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            prevLabel={BEHAVIORAL_HISTORY_CONSTANTS.PAGINATION.PREV}
-            nextLabel={BEHAVIORAL_HISTORY_CONSTANTS.PAGINATION.NEXT}
-          />
         )}
       </div>
     </div>

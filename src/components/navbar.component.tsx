@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bell, User } from 'lucide-react';
 import { NavigationItem } from '../interfaces/behavioral-history.interface';
+import LanguageSelector from './language-selector.component';
 
 interface NavbarProps {
   brand: string;
@@ -36,6 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({ brand, links, activePath, onNavigate })
             </div>
             
             <div className="flex items-center space-x-4">
+              <LanguageSelector />
               <button className="text-gray-600 hover:text-gray-900 transition-colors">
                 <Bell size={20} />
               </button>

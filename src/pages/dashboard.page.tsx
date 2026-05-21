@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../components/navbar.component';
 import Card from '../components/card.component';
 import { dashboardService } from '../services/dashboard.service';
@@ -10,6 +11,7 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +41,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           onNavigate={onNavigate}
         />
         <div className="flex items-center justify-center h-96">
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-gray-500">{t('loading')}</div>
         </div>
       </div>
     );
@@ -56,32 +58,32 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          {DASHBOARD_CONSTANTS.PAGE_TITLE}
+          {t('dashboard.title')}
         </h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="p-6">
-            <p className="text-sm text-gray-600 mb-1">{DASHBOARD_CONSTANTS.STATS.TOTAL_SAVINGS}</p>
+            <p className="text-sm text-gray-600 mb-1">{t('dashboard.totalSavings')}</p>
             <p className="text-3xl font-bold text-green-600">${stats?.totalSavings}</p>
           </Card>
           <Card className="p-6">
-            <p className="text-sm text-gray-600 mb-1">{DASHBOARD_CONSTANTS.STATS.GOALS_ACHIEVED}</p>
+            <p className="text-sm text-gray-600 mb-1">{t('dashboard.goalsAchieved')}</p>
             <p className="text-3xl font-bold text-blue-600">{stats?.goalsAchieved}</p>
           </Card>
           <Card className="p-6">
-            <p className="text-sm text-gray-600 mb-1">{DASHBOARD_CONSTANTS.STATS.CURRENT_STREAK}</p>
+            <p className="text-sm text-gray-600 mb-1">{t('dashboard.currentStreak')}</p>
             <p className="text-3xl font-bold text-purple-600">{stats?.currentStreak}</p>
           </Card>
           <Card className="p-6">
-            <p className="text-sm text-gray-600 mb-1">{DASHBOARD_CONSTANTS.STATS.ACTIVE_GOALS}</p>
+            <p className="text-sm text-gray-600 mb-1">{t('dashboard.activeGoals')}</p>
             <p className="text-3xl font-bold text-orange-600">{stats?.activeGoals}</p>
           </Card>
         </div>
         
         <Card className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Welcome Back!</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('dashboard.welcomeBack')}</h2>
           <p className="text-gray-600">
-            You're doing great! Keep tracking your spending and achieving your financial goals.
+            {t('dashboard.doingGreat')}
           </p>
         </Card>
       </div>
