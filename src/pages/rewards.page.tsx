@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/navbar.component';
 import Card from '../components/card.component';
 import Button from '../components/button.component';
+import ErrorState from '../components/error-state.component';
 import { rewardsService } from '../services/rewards.service';
 import { REWARDS_CONSTANTS } from '../constants/rewards.constant';
 import { Reward, UserPoints } from '../interfaces/rewards.interface';
+import { getErrorMessage } from '../utils/api';
 
 interface RewardsProps {
   onNavigate?: (path: string) => void;
@@ -14,31 +16,36 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [userPoints, setUserPoints] = useState<UserPoints | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [unlocking, setUnlocking] = useState<string | null>(null);
   const [unlocked, setUnlocked] = useState<string | null>(null);
+  const [unlockError, setUnlockError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [rewardsResponse, pointsResponse] = await Promise.all([
+        rewardsService.getRewards(),
+        rewardsService.getUserPoints(),
+      ]);
+      setRewards(rewardsResponse.data);
+      setUserPoints(pointsResponse.data);
+    } catch (err) {
+      console.error('Error fetching rewards data:', err);
+      setError(getErrorMessage(err, 'Failed to load rewards data.'));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [rewardsResponse, pointsResponse] = await Promise.all([
-          rewardsService.getRewards(),
-          rewardsService.getUserPoints(),
-        ]);
-        setRewards(rewardsResponse.data);
-        setUserPoints(pointsResponse.data);
-      } catch (error) {
-        console.error('Error fetching rewards data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleUnlock = async (rewardId: string) => {
     setUnlocking(rewardId);
+    setUnlockError(null);
     try {
       await rewardsService.unlockReward(rewardId);
       setUnlocked(rewardId);
@@ -46,8 +53,9 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
         prev.map(reward => (reward.id === rewardId ? { ...reward, unlocked: true } : reward))
       );
       setTimeout(() => setUnlocked(null), 3000);
-    } catch (error) {
-      console.error('Error unlocking reward:', error);
+    } catch (err) {
+      console.error('Error unlocking reward:', err);
+      setUnlockError(getErrorMessage(err, 'Failed to unlock reward. Please try again.'));
     } finally {
       setUnlocking(null);
     }
@@ -69,6 +77,20 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar
+          brand={REWARDS_CONSTANTS.NAVIGATION.BRAND}
+          links={REWARDS_CONSTANTS.NAVIGATION.LINKS}
+          activePath="/rewards"
+          onNavigate={onNavigate}
+        />
+        <ErrorState message={error} onRetry={fetchData} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar
@@ -82,6 +104,15 @@ const Rewards: React.FC<RewardsProps> = ({ onNavigate }) => {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           {REWARDS_CONSTANTS.PAGE_TITLE}
         </h1>
+
+        {unlockError && (
+          <div
+            role="alert"
+            className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            {unlockError}
+          </div>
+        )}
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2">

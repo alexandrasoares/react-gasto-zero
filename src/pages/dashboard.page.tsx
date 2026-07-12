@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/navbar.component';
 import Card from '../components/card.component';
+import ErrorState from '../components/error-state.component';
 import { dashboardService } from '../services/dashboard.service';
 import { DASHBOARD_CONSTANTS } from '../constants/dashboard.constant';
 import { DashboardStats } from '../interfaces/dashboard.interface';
+import { getErrorMessage } from '../utils/api';
 
 interface DashboardProps {
   onNavigate?: (path: string) => void;
@@ -12,22 +14,25 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await dashboardService.getStats();
+      setStats(response.data);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError(getErrorMessage(err, 'Failed to load dashboard data.'));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await dashboardService.getStats();
-        setStats(response.data);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   if (loading) {
     return (
@@ -41,6 +46,20 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-center h-96">
           <div className="text-gray-500">Loading...</div>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar
+          brand={DASHBOARD_CONSTANTS.NAVIGATION.BRAND}
+          links={DASHBOARD_CONSTANTS.NAVIGATION.LINKS}
+          activePath="/dashboard"
+          onNavigate={onNavigate}
+        />
+        <ErrorState message={error} onRetry={fetchData} />
       </div>
     );
   }
