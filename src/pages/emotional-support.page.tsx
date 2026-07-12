@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../components/navbar.component';
+import PageLayout from '../components/page-layout.component';
 import Card from '../components/card.component';
 import Button from '../components/button.component';
 import { emotionalSupportService } from '../services/emotional-support.service';
@@ -60,31 +60,13 @@ const EmotionalSupport: React.FC<EmotionalSupportProps> = ({ onNavigate }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar
-          brand={EMOTIONAL_SUPPORT_CONSTANTS.NAVIGATION.BRAND}
-          links={EMOTIONAL_SUPPORT_CONSTANTS.NAVIGATION.LINKS}
-          activePath="/support"
-          onNavigate={onNavigate}
-        />
-        <div className="flex items-center justify-center h-96">
-          <div className="text-gray-500">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar
-        brand={EMOTIONAL_SUPPORT_CONSTANTS.NAVIGATION.BRAND}
-        links={EMOTIONAL_SUPPORT_CONSTANTS.NAVIGATION.LINKS}
-        activePath="/support"
-        onNavigate={onNavigate}
-      />
-      
+    <PageLayout
+      navigation={EMOTIONAL_SUPPORT_CONSTANTS.NAVIGATION}
+      activePath="/support"
+      onNavigate={onNavigate}
+      loading={loading}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           {EMOTIONAL_SUPPORT_CONSTANTS.PAGE_TITLE}
@@ -172,7 +154,7 @@ const EmotionalSupport: React.FC<EmotionalSupportProps> = ({ onNavigate }) => {
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

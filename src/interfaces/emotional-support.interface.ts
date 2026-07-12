@@ -13,9 +13,3 @@ export interface Commitment {
   text: string;
   savedAt: string;
 }
-
-export interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message: string;
-}

@@ -23,9 +23,3 @@ export interface LeaderboardEntry {
   user: string;
   points: number;
 }
-
-export interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message: string;
-}

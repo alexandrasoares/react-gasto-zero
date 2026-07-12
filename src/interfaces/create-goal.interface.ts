@@ -5,9 +5,3 @@ export interface GoalFormData {
   category: string;
   goalType: 'personal' | 'weekly';
 }
-
-export interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message: string;
-}

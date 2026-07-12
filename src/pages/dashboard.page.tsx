@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../components/navbar.component';
+import PageLayout from '../components/page-layout.component';
 import Card from '../components/card.component';
 import { dashboardService } from '../services/dashboard.service';
 import { DASHBOARD_CONSTANTS } from '../constants/dashboard.constant';
@@ -29,31 +29,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar
-          brand={DASHBOARD_CONSTANTS.NAVIGATION.BRAND}
-          links={DASHBOARD_CONSTANTS.NAVIGATION.LINKS}
-          activePath="/dashboard"
-          onNavigate={onNavigate}
-        />
-        <div className="flex items-center justify-center h-96">
-          <div className="text-gray-500">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar
-        brand={DASHBOARD_CONSTANTS.NAVIGATION.BRAND}
-        links={DASHBOARD_CONSTANTS.NAVIGATION.LINKS}
-        activePath="/dashboard"
-        onNavigate={onNavigate}
-      />
-      
+    <PageLayout
+      navigation={DASHBOARD_CONSTANTS.NAVIGATION}
+      activePath="/dashboard"
+      onNavigate={onNavigate}
+      loading={loading}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           {DASHBOARD_CONSTANTS.PAGE_TITLE}
@@ -85,7 +67,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           </p>
         </Card>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
