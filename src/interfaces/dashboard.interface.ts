@@ -4,9 +4,3 @@ export interface DashboardStats {
   currentStreak: number;
   activeGoals: number;
 }
-
-export interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message: string;
-}

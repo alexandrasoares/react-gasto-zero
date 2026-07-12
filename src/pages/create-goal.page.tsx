@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navbar from '../components/navbar.component';
+import PageLayout from '../components/page-layout.component';
 import Input from '../components/input.component';
 import Button from '../components/button.component';
 import { createGoalService } from '../services/create-goal.service';
@@ -47,13 +47,11 @@ const CreateGoal: React.FC<CreateGoalProps> = ({ onNavigate }) => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar
-          brand={CREATE_GOAL_CONSTANTS.NAVIGATION.BRAND}
-          links={CREATE_GOAL_CONSTANTS.NAVIGATION.LINKS}
-          activePath="/goals"
-          onNavigate={onNavigate}
-        />
+      <PageLayout
+        navigation={CREATE_GOAL_CONSTANTS.NAVIGATION}
+        activePath="/goals"
+        onNavigate={onNavigate}
+      >
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Goal Created Successfully!</h2>
@@ -65,19 +63,16 @@ const CreateGoal: React.FC<CreateGoalProps> = ({ onNavigate }) => {
             </Button>
           </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar
-        brand={CREATE_GOAL_CONSTANTS.NAVIGATION.BRAND}
-        links={CREATE_GOAL_CONSTANTS.NAVIGATION.LINKS}
-        activePath="/goals"
-        onNavigate={onNavigate}
-      />
-      
+    <PageLayout
+      navigation={CREATE_GOAL_CONSTANTS.NAVIGATION}
+      activePath="/goals"
+      onNavigate={onNavigate}
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           {CREATE_GOAL_CONSTANTS.PAGE_TITLE}
@@ -147,7 +142,7 @@ const CreateGoal: React.FC<CreateGoalProps> = ({ onNavigate }) => {
           </div>
         </form>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

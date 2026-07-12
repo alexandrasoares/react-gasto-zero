@@ -1,5 +1,5 @@
 import React from 'react';
-import { TabItem } from '../interfaces/behavioral-history.interface';
+import { TabItem } from '../interfaces/common.interface';
 
 interface TabsProps {
   tabs: TabItem[];

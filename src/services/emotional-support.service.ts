@@ -1,31 +1,22 @@
-import { SelfControlTip, ProgressData, Commitment, ApiResponse } from '../interfaces/emotional-support.interface';
+import { SelfControlTip, ProgressData, Commitment } from '../interfaces/emotional-support.interface';
+import { ApiResponse } from '../interfaces/common.interface';
+import { delay, mockResponse } from '../utils/api.util';
 import { selfControlTipsMock, progressDataMock } from '../utils/mock/emotional-support.mock';
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const emotionalSupportService = {
   getSelfControlTips: async (): Promise<ApiResponse<SelfControlTip[]>> => {
     await delay(600);
-    return {
-      data: selfControlTipsMock,
-      status: 200,
-      message: 'Success',
-    };
+    return mockResponse(selfControlTipsMock);
   },
   getProgressData: async (): Promise<ApiResponse<ProgressData>> => {
     await delay(500);
-    return {
-      data: progressDataMock,
-      status: 200,
-      message: 'Success',
-    };
+    return mockResponse(progressDataMock);
   },
   saveCommitment: async (text: string): Promise<ApiResponse<Commitment>> => {
     await delay(900);
-    return {
-      data: { text, savedAt: new Date().toISOString() },
-      status: 201,
-      message: 'Commitment saved successfully',
-    };
+    return mockResponse(
+      { text, savedAt: new Date().toISOString() },
+      { status: 201, message: 'Commitment saved successfully' }
+    );
   },
 };

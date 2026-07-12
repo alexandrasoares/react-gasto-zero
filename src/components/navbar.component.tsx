@@ -1,6 +1,6 @@
 import React from 'react';
 import { Bell, User } from 'lucide-react';
-import { NavigationItem } from '../interfaces/behavioral-history.interface';
+import { NavigationItem } from '../interfaces/common.interface';
 
 interface NavbarProps {
   brand: string;

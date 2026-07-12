@@ -1,31 +1,22 @@
-import { Reward, UserPoints, ApiResponse } from '../interfaces/rewards.interface';
+import { Reward, UserPoints } from '../interfaces/rewards.interface';
+import { ApiResponse } from '../interfaces/common.interface';
+import { delay, mockResponse } from '../utils/api.util';
 import { rewardsMock, userPointsMock } from '../utils/mock/rewards.mock';
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const rewardsService = {
   getRewards: async (): Promise<ApiResponse<Reward[]>> => {
     await delay(600);
-    return {
-      data: rewardsMock,
-      status: 200,
-      message: 'Success',
-    };
+    return mockResponse(rewardsMock);
   },
   getUserPoints: async (): Promise<ApiResponse<UserPoints>> => {
     await delay(400);
-    return {
-      data: userPointsMock,
-      status: 200,
-      message: 'Success',
-    };
+    return mockResponse(userPointsMock);
   },
   unlockReward: async (_rewardId: string): Promise<ApiResponse<{ success: boolean }>> => {
     await delay(800);
-    return {
-      data: { success: true },
-      status: 200,
-      message: 'Reward unlocked successfully',
-    };
+    return mockResponse(
+      { success: true },
+      { message: 'Reward unlocked successfully' }
+    );
   },
 };

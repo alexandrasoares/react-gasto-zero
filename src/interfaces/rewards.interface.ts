@@ -11,9 +11,3 @@ export interface Reward {
 export interface UserPoints {
   total: number;
 }
-
-export interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message: string;
-}
