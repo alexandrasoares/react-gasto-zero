@@ -1,15 +1,14 @@
 import { DashboardStats, ApiResponse } from '../interfaces/dashboard.interface';
 import { dashboardStatsMock } from '../utils/mock/dashboard.mock';
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import { delay, resolveApiResponse } from '../utils/api';
 
 export const dashboardService = {
   getStats: async (): Promise<ApiResponse<DashboardStats>> => {
     await delay(600);
-    return {
+    return resolveApiResponse({
       data: dashboardStatsMock,
       status: 200,
       message: 'Success',
-    };
+    });
   },
 };

@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/navbar.component';
 import Tabs from '../components/tabs.component';
 import TimelineCard from '../components/timeline-card.component';
 import Pagination from '../components/pagination.component';
+import ErrorState from '../components/error-state.component';
 import { behavioralHistoryService } from '../services/behavioral-history.service';
 import { BEHAVIORAL_HISTORY_CONSTANTS } from '../constants/behavioral-history.constant';
 import { TimelineEntry } from '../interfaces/behavioral-history.interface';
+import { getErrorMessage } from '../utils/api';
 
 interface BehavioralHistoryProps {
   onNavigate?: (path: string) => void;
@@ -14,25 +16,28 @@ interface BehavioralHistoryProps {
 const BehavioralHistory: React.FC<BehavioralHistoryProps> = ({ onNavigate }) => {
   const [timelineEntries, setTimelineEntries] = useState<TimelineEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('timeline');
   const [currentPage, setCurrentPage] = useState(1);
   const entriesPerPage = 5;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await behavioralHistoryService.getTimelineEntries();
-        setTimelineEntries(response.data);
-      } catch (error) {
-        console.error('Error fetching timeline entries:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await behavioralHistoryService.getTimelineEntries();
+      setTimelineEntries(response.data);
+    } catch (err) {
+      console.error('Error fetching timeline entries:', err);
+      setError(getErrorMessage(err, 'Failed to load timeline entries.'));
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const totalPages = Math.ceil(timelineEntries.length / entriesPerPage);
   const startIndex = (currentPage - 1) * entriesPerPage;
@@ -59,6 +64,20 @@ const BehavioralHistory: React.FC<BehavioralHistoryProps> = ({ onNavigate }) => 
         <div className="flex items-center justify-center h-96">
           <div className="text-gray-500">Loading...</div>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar
+          brand={BEHAVIORAL_HISTORY_CONSTANTS.NAVIGATION.BRAND}
+          links={BEHAVIORAL_HISTORY_CONSTANTS.NAVIGATION.LINKS}
+          activePath="/history"
+          onNavigate={onNavigate}
+        />
+        <ErrorState message={error} onRetry={fetchData} />
       </div>
     );
   }

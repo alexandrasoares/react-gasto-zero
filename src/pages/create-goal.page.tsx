@@ -5,6 +5,7 @@ import Button from '../components/button.component';
 import { createGoalService } from '../services/create-goal.service';
 import { CREATE_GOAL_CONSTANTS } from '../constants/create-goal.constant';
 import { GoalFormData } from '../interfaces/create-goal.interface';
+import { getErrorMessage } from '../utils/api';
 
 interface CreateGoalProps {
   onNavigate?: (path: string) => void;
@@ -20,10 +21,12 @@ const CreateGoal: React.FC<CreateGoalProps> = ({ onNavigate }) => {
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSubmitError(null);
     try {
       await createGoalService.createGoal(formData);
       setSubmitted(true);
@@ -36,6 +39,7 @@ const CreateGoal: React.FC<CreateGoalProps> = ({ onNavigate }) => {
       });
     } catch (error) {
       console.error('Error creating goal:', error);
+      setSubmitError(getErrorMessage(error, 'Failed to create goal. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -135,6 +139,12 @@ const CreateGoal: React.FC<CreateGoalProps> = ({ onNavigate }) => {
             </Button>
           </div>
           
+          {submitError && (
+            <p role="alert" className="text-sm text-red-600">
+              {submitError}
+            </p>
+          )}
+
           <div className="flex justify-end">
             <Button
               type="submit"

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/navbar.component';
 import Card from '../components/card.component';
 import Button from '../components/button.component';
+import ErrorState from '../components/error-state.component';
 import { emotionalSupportService } from '../services/emotional-support.service';
 import { EMOTIONAL_SUPPORT_CONSTANTS } from '../constants/emotional-support.constant';
 import { SelfControlTip, ProgressData } from '../interfaces/emotional-support.interface';
+import { getErrorMessage } from '../utils/api';
 
 interface EmotionalSupportProps {
   onNavigate?: (path: string) => void;
@@ -15,28 +17,32 @@ const EmotionalSupport: React.FC<EmotionalSupportProps> = ({ onNavigate }) => {
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
   const [commitment, setCommitment] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [tipsResponse, progressResponse] = await Promise.all([
+        emotionalSupportService.getSelfControlTips(),
+        emotionalSupportService.getProgressData(),
+      ]);
+      setSelfControlTips(tipsResponse.data);
+      setProgressData(progressResponse.data);
+    } catch (err) {
+      console.error('Error fetching emotional support data:', err);
+      setError(getErrorMessage(err, 'Failed to load emotional support data.'));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [tipsResponse, progressResponse] = await Promise.all([
-          emotionalSupportService.getSelfControlTips(),
-          emotionalSupportService.getProgressData(),
-        ]);
-        setSelfControlTips(tipsResponse.data);
-        setProgressData(progressResponse.data);
-      } catch (error) {
-        console.error('Error fetching emotional support data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleTipToggle = (id: string) => {
     setSelfControlTips(prev =>
@@ -46,15 +52,17 @@ const EmotionalSupport: React.FC<EmotionalSupportProps> = ({ onNavigate }) => {
 
   const handleSaveCommitment = async () => {
     if (!commitment.trim()) return;
-    
+
     setSaving(true);
+    setSaveError(null);
     try {
       await emotionalSupportService.saveCommitment(commitment);
       setSaved(true);
       setCommitment('');
       setTimeout(() => setSaved(false), 3000);
-    } catch (error) {
-      console.error('Error saving commitment:', error);
+    } catch (err) {
+      console.error('Error saving commitment:', err);
+      setSaveError(getErrorMessage(err, 'Failed to save commitment. Please try again.'));
     } finally {
       setSaving(false);
     }
@@ -72,6 +80,20 @@ const EmotionalSupport: React.FC<EmotionalSupportProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-center h-96">
           <div className="text-gray-500">Loading...</div>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar
+          brand={EMOTIONAL_SUPPORT_CONSTANTS.NAVIGATION.BRAND}
+          links={EMOTIONAL_SUPPORT_CONSTANTS.NAVIGATION.LINKS}
+          activePath="/support"
+          onNavigate={onNavigate}
+        />
+        <ErrorState message={error} onRetry={fetchData} />
       </div>
     );
   }
@@ -132,6 +154,11 @@ const EmotionalSupport: React.FC<EmotionalSupportProps> = ({ onNavigate }) => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
                   rows={4}
                 />
+                {saveError && (
+                  <p role="alert" className="text-sm text-red-600">
+                    {saveError}
+                  </p>
+                )}
                 <div className="flex justify-end">
                   <Button
                     onClick={handleSaveCommitment}

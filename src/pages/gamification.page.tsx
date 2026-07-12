@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/navbar.component';
 import Card from '../components/card.component';
+import ErrorState from '../components/error-state.component';
 import { gamificationService } from '../services/gamification.service';
 import { GAMIFICATION_CONSTANTS } from '../constants/gamification.constant';
 import { GamificationStats, Badge, Achievement, LeaderboardEntry } from '../interfaces/gamification.interface';
+import { getErrorMessage } from '../utils/api';
 
 interface GamificationProps {
   onNavigate?: (path: string) => void;
@@ -15,30 +17,33 @@ const Gamification: React.FC<GamificationProps> = ({ onNavigate }) => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [statsResponse, badgesResponse, achievementsResponse, leaderboardResponse] = await Promise.all([
+        gamificationService.getStats(),
+        gamificationService.getBadges(),
+        gamificationService.getAchievements(),
+        gamificationService.getLeaderboard(),
+      ]);
+      setStats(statsResponse.data);
+      setBadges(badgesResponse.data);
+      setAchievements(achievementsResponse.data);
+      setLeaderboard(leaderboardResponse.data);
+    } catch (err) {
+      console.error('Error fetching gamification data:', err);
+      setError(getErrorMessage(err, 'Failed to load gamification data.'));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [statsResponse, badgesResponse, achievementsResponse, leaderboardResponse] = await Promise.all([
-          gamificationService.getStats(),
-          gamificationService.getBadges(),
-          gamificationService.getAchievements(),
-          gamificationService.getLeaderboard(),
-        ]);
-        setStats(statsResponse.data);
-        setBadges(badgesResponse.data);
-        setAchievements(achievementsResponse.data);
-        setLeaderboard(leaderboardResponse.data);
-      } catch (error) {
-        console.error('Error fetching gamification data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   if (loading) {
     return (
@@ -52,6 +57,20 @@ const Gamification: React.FC<GamificationProps> = ({ onNavigate }) => {
         <div className="flex items-center justify-center h-96">
           <div className="text-gray-500">Loading...</div>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar
+          brand={GAMIFICATION_CONSTANTS.NAVIGATION.BRAND}
+          links={GAMIFICATION_CONSTANTS.NAVIGATION.LINKS}
+          activePath="/gamification"
+          onNavigate={onNavigate}
+        />
+        <ErrorState message={error} onRetry={fetchData} />
       </div>
     );
   }
